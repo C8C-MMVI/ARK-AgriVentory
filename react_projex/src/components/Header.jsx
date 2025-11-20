@@ -1,6 +1,13 @@
 function Header({onSidebarToggle}){
     return(
-        <button onClick={onSidebarToggle}>Toggle</button>
+        <header>
+            <div>
+                <button onClick={onSidebarToggle}>Toggle</button>
+            </div>
+            <div>
+
+            </div>
+        </header>
     )
 }
 
