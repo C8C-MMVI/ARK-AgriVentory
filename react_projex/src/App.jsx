@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Routes, Route} from "react-router-dom"
 import Dashboard from "./pages/Dashboard"
 import Users from "./pages/Users"
+import Settings from "./pages/Settings"
 
 const App = () => {
   const [sidebarToggle, setSidebarToggle] = useState(true);
@@ -20,7 +21,8 @@ const App = () => {
         <main className="flex-1 bg-slate-200">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/products" element={<Users />} />
+            <Route path="/users" element={<Users/>} />
+            <Route path="/settings" element={<Settings/>} />
           </Routes>
         </main>
       </div>
