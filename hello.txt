@@ -1,3 +1,0 @@
-This is a trial repository for the following projects:
-Backend: Spring Boot
-Frontend: ReactJS
