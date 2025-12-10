@@ -1,24 +1,46 @@
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useState } from "react";
 
-const AuthContext = createContext(null)
+const AuthContext = createContext(null);
 
-export const AuthProvider = ({children}) => {
+export const AuthProvider = ({ children }) => {
+  // Dummy account
+  const DUMMY_USER = { username: "admin", password: "admin" };
 
-    const [token, setToken] = useState(localStorage.getItem("token"))
-    
-    function login(newToken){
-        setToken(newToken)
-        localStorage.setItem("token", newToken)
+  // Safely read user from localStorage
+  let initialUser = null;
+  try {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) initialUser = JSON.parse(storedUser);
+  } catch (err) {
+    console.warn("Failed to parse user from localStorage:", err);
+    localStorage.removeItem("user"); // clear bad value
+  }
+
+  const [user, setUser] = useState(initialUser);
+
+  // Simulated login
+  function login(username, password) {
+    if (username === DUMMY_USER.username && password === DUMMY_USER.password) {
+      const userData = { username };
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+      return true;
     }
+    return false;
+  }
 
-    function logout(){
-        setToken(null)
-        localStorage.removeItem("token")
-    }
+  function logout() {
+    setUser(null);
+    localStorage.removeItem("user");
+  }
 
-    const authData = {token, login, logout}
-    return<AuthContext.Provider value={authData}>{children}</AuthContext.Provider>
-}
-export function useAuth(){
-    return useContext(AuthContext)
+  return (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export function useAuth() {
+  return useContext(AuthContext);
 }

@@ -1,13 +1,20 @@
 import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Header({ onSidebarToggle }) {
-    const {logout} = useAuth()
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
-    function onLogout(){
+  const handleLogout = () => {
+    logout();
+    setMenuOpen(false);
+    navigate("/"); // Redirect to landing page after logout
+  };
 
-    }
   return (
-    <header className="bg-white shadow-sm ">
+    <header className="bg-white shadow-sm">
       <div className="flex items-center justify-between px-6 py-4">
         {/* Hamburger Icon / Toggle */}
         <button onClick={onSidebarToggle}>
@@ -25,72 +32,51 @@ function Header({ onSidebarToggle }) {
             />
           </svg>
         </button>
-        {/* Search bar */}
-        <div className="flex items-center space-x-4">
-          <div className="relative ">
-            <svg
-              className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search..."
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
 
-          {/* Notifications */}
-          <div>
-            <button className="relative text-gray-600 hover:text-gray-900">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                />
-              </svg>
-              <span
-                className="absolute -top-1 -right-1 w-4 h-4 
-                        bg-red-500 font-bold 
-                        text-white rounded-full text-xs
-                        flex justify-center items-center"
-              >
-                8
-              </span>
-            </button>
-          </div>
+        {/* Right Section */}
+        <div className="relative">
+          {/* Profile Button */}
+          <button
+            onClick={() => setMenuOpen(true)}
+            className="bg-blue-500 font-bold rounded-full w-10 h-10
+                       text-white flex justify-center items-center"
+          >
+            RN
+          </button>
 
-          {/* Profile */}
-          <div>
-            <p
-              className="bg-blue-500 font-bold rounded-full w-10 h-10
-             text-white flex justify-center items-center"
-            >
-              RN
-            </p>
-          </div>
-          <div>
-            <button onClick={logout}>Logout</button>
-          </div>
+          {/* Modal Pop-up */}
+          {menuOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="bg-white rounded-lg shadow-lg w-64 p-4 relative">
+                <h3 className="text-lg font-semibold mb-4">Profile Options</h3>
+                <div className="flex flex-col space-y-2">
+                  <button
+                    onClick={() => {
+                      navigate("/dashboard"); // Navigate to dashboard correctly
+                      setMenuOpen(false);
+                    }}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    To Dashboard
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  >
+                    Log Out
+                  </button>
+                  <button
+                    onClick={() => setMenuOpen(false)}
+                    className="px-4 py-2 border rounded hover:bg-gray-100"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-
-      <div></div>
     </header>
   );
 }
