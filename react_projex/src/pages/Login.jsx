@@ -16,7 +16,7 @@ export default function Login() {
 
     const success = login(username, password); // dummy login
     if (success) {
-      navigate("/home");
+      navigate("/");
     } else {
       setError("Invalid username or password");
     }
@@ -30,11 +30,7 @@ export default function Login() {
           className="hidden md:flex w-1/2 h-96 
         bg-white justify-center items-center rounded-l-xl"
         >
-          <img
-            src="/ARK2.png"
-            alt="ARK Agriventory Logo"
-            className="p-5"
-          />
+          <img src="/ARK2.png" alt="ARK Agriventory Logo" className="p-5" />
         </div>
 
         {/* Right: Login Form */}

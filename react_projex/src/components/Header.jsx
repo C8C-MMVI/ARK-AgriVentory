@@ -1,17 +1,20 @@
 import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Header({ onSidebarToggle }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   function handleLogout() {
     logout();
-    navigate("/login");
+    setMenuOpen(false);
+    navigate("/login"); // Redirect to login after logout
   }
 
   return (
-    <header className="bg-white shadow-sm">
+    <header className="bg-white shadow-sm border-b-8 border-[#4C763B]">
       <div className="flex items-center justify-between px-6 py-4">
         {/* Sidebar Toggle */}
         <button onClick={onSidebarToggle}>
@@ -35,13 +38,12 @@ function Header({ onSidebarToggle }) {
           <input
             type="text"
             placeholder="Search..."
-            className="w-full max-w-md px-3 py-2 border rounded focus:outline-none 
-                       focus:ring-2 focus:ring-blue-500"
+            className="w-full max-w-md px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         {/* Right Section */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 relative">
           {/* Notification Bell */}
           <button className="relative">
             <svg
@@ -60,20 +62,35 @@ function Header({ onSidebarToggle }) {
           </button>
 
           {/* Dummy Profile */}
-          <div
-            className="bg-blue-500 font-bold rounded-full w-10 h-10
-                          text-white flex justify-center items-center"
+          <button
+            onClick={() => setMenuOpen(true)}
+            className="bg-[#4C763B] font-bold rounded-full w-10 h-10 text-white flex justify-center items-center"
           >
             RN
-          </div>
-
-          {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Log Out
           </button>
+
+          {/* Dropdown Modal */}
+          {menuOpen && (
+            <div className="absolute right-0 top-12 z-50 font-lexend">
+              <div className="bg-white rounded-lg shadow-lg w-60 p-2 ">
+                <h3 className="text-lg font-semibold mb-4">Profile Options</h3>
+                <div className="flex flex-col space-y-2">
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-1 bg-[#4C763B] text-white rounded hover:bg-[#B8C4A9] transition-colors"
+                  >
+                    Log Out
+                  </button>
+                  <button
+                    onClick={() => setMenuOpen(false)}
+                    className="px-4 py-1 border rounded hover:bg-gray-100 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>

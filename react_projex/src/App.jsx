@@ -3,7 +3,7 @@ import Header from "./components/Header";
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
-import Home from "./pages/HomePage";
+import Home from "./pages/HomePAge";
 import UserSettings from "./pages/UserSettings";
 import POS from "./pages/PointOfSales";
 import Transactions from "./pages/Transactions";
@@ -32,7 +32,7 @@ const App = () => {
               <Sidebar isOpen={sidebarToggle} />
               <div className="flex-1 flex flex-col">
                 <Header onSidebarToggle={toggleSidebar} />
-                <main className="flex-1 bg-slate-200">
+                <main className="flex-1 ">
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/dashboard" element={<Dashboard />} />
