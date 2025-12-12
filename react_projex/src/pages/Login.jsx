@@ -6,30 +6,31 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
-    const success = login(username, password); // dummy login
+    const success = await login(username, password);
     if (success) {
-      navigate("/");
+      navigate("/"); // redirect to home page
     } else {
       setError("Invalid username or password");
     }
+
+    setLoading(false);
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white shadow-md w-full max-w-4xl flex overflow-hidden rounded-xl">
         {/* Left: Logo */}
-        <div
-          className="hidden md:flex w-1/2 h-96 
-        bg-white justify-center items-center rounded-l-xl"
-        >
+        <div className="hidden md:flex w-1/2 h-96 bg-white justify-center items-center rounded-l-xl">
           <img src="/ARK2.png" alt="ARK Agriventory Logo" className="p-5" />
         </div>
 
@@ -71,9 +72,10 @@ export default function Login() {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Log In
+              {loading ? "Signing in..." : "Log In"}
             </button>
           </form>
         </div>

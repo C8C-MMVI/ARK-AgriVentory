@@ -10,6 +10,7 @@ import Transactions from "./pages/Transactions";
 import UserProfile from "./pages/UserProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
+import Suppliers from "./pages/Suppliers";
 
 const App = () => {
   const [sidebarToggle, setSidebarToggle] = useState(true);
@@ -39,6 +40,7 @@ const App = () => {
                     <Route path="/usersettings" element={<UserSettings />} />
                     <Route path="/pos" element={<POS />} />
                     <Route path="/transactions" element={<Transactions />} />
+                    <Route path="/suppliers" element={<Suppliers />} />
                     <Route path="/profile" element={<UserProfile />} />
                   </Routes>
                 </main>

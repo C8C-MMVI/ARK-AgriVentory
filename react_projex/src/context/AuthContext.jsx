@@ -1,34 +1,49 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    !!localStorage.getItem("auth")
-  );
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
-  function login(username, password) {
-    // dummy condition
-    if (username === "admin" && password === "admin") {
-      setIsAuthenticated(true);
-      localStorage.setItem("auth", "true");
+  const login = async (username, password) => {
+    try {
+      const res = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!res.ok) throw new Error("Invalid username or password");
+
+      const data = await res.json();
+
+      // Save user info and token
+      const userData = { username: data.username, token: data.token };
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+
       return true;
+    } catch (err) {
+      console.error(err);
+      return false;
     }
-    return false;
-  }
+  };
 
-  function logout() {
-    setIsAuthenticated(false);
-    localStorage.removeItem("auth");
-  }
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+  };
+
+  const isAuthenticated = !!user;
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
+export const useAuth = () => useContext(AuthContext);
