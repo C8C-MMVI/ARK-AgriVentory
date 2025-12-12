@@ -56,7 +56,7 @@ function Sidebar({ isOpen }) {
       <nav className="flex-1 overflow-y-auto">
         {sections.map((section, idx) => (
           <div key={idx} className="mt-4">
-            <h3 className="px-6 text-sm font-semibold text-white mb-2 uppercase tracking-wide font-lexend">
+            <h3 className="px-6 text-sm font-bold text-white mb-2 uppercase tracking-wide font-nunito text-[16px] ">
               {section.title}
             </h3>
 
