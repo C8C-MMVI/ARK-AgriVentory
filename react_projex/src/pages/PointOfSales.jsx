@@ -1,33 +1,14 @@
 function PointOfSales() {
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Point of Sales</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="font-semibold mb-2">Scan Product</h2>
-          <input
-            type="text"
-            className="w-full p-2 border rounded"
-            placeholder="Enter barcode or scan..."
-          />
-        </div>
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="font-semibold mb-2">Cart</h2>
-          <ul className="space-y-1">
-            <li className="flex justify-between">
-              Item 1 <span>$10</span>
-            </li>
-            <li className="flex justify-between">
-              Item 2 <span>$25</span>
-            </li>
-            <li className="flex justify-between font-bold">
-              Total <span>$35</span>
-            </li>
-          </ul>
-          <button className="mt-4 w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
-            Checkout
-          </button>
-        </div>
+    <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="md:col-span-2 bg-white rounded-xl shadow p-4">
+        <h2 className="font-bold">Products</h2>
+        <p className="text-sm text-gray-500">Select items to add</p>
+      </div>
+
+      <div className="bg-white rounded-xl shadow p-4">
+        <h2 className="font-bold">Cart</h2>
+        <p className="text-sm text-gray-500">No items yet</p>
       </div>
     </div>
   );

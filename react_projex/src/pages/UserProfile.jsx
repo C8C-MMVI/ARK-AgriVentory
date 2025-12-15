@@ -1,23 +1,18 @@
 function UserProfile() {
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">User Profile</h1>
-      <div className="bg-white p-6 rounded shadow max-w-lg space-y-4">
+    <div className="p-6 max-w-xl">
+      <h1 className="text-2xl font-bold font-lexend">User Profile</h1>
+
+      <div className="bg-white rounded-xl shadow mt-6 p-4 space-y-3">
         <div>
-          <h2 className="font-semibold">Full Name</h2>
-          <p>Raiven Christian Navor</p>
+          <label className="text-sm text-gray-500">Name</label>
+          <p className="font-semibold">Admin User</p>
         </div>
+
         <div>
-          <h2 className="font-semibold">Email</h2>
-          <p>raiven@example.com</p>
+          <label className="text-sm text-gray-500">Email</label>
+          <p className="font-semibold">admin@ark.com</p>
         </div>
-        <div>
-          <h2 className="font-semibold">Role</h2>
-          <p>Administrator</p>
-        </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Edit Profile
-        </button>
       </div>
     </div>
   );

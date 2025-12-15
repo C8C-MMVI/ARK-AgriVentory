@@ -1,0 +1,41 @@
+// MainLayout.jsx
+import Sidebar from "./Sidebar";
+import Header from "./Header";
+import { Routes, Route } from "react-router-dom";
+
+// Pages
+import Home from "../pages/HomePAge";
+import Dashboard from "../pages/Dashboard";
+import Categories from "../pages/Categories";
+import Products from "../pages/Products";
+import StockRecords from "../pages/StockRecords";
+import UserSettings from "../pages/UserSettings";
+import POS from "../pages/PointOfSales";
+import Transactions from "../pages/Transactions";
+import Suppliers from "../pages/Suppliers";
+import UserProfile from "../pages/UserProfile";
+
+const MainLayout = ({ sidebarToggle, toggleSidebar }) => (
+  <div className="flex h-screen bg-gray-50">
+    <Sidebar isOpen={sidebarToggle} />
+    <div className="flex-1 flex flex-col">
+      <Header onSidebarToggle={toggleSidebar} />
+      <main className="flex-1">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/stock" element={<StockRecords />} />
+          <Route path="/usersettings" element={<UserSettings />} />
+          <Route path="/pos" element={<POS />} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/suppliers" element={<Suppliers />} />
+          <Route path="/profile" element={<UserProfile />} />
+        </Routes>
+      </main>
+    </div>
+  </div>
+);
+
+export default MainLayout;

@@ -1,42 +1,41 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Suppliers() {
-  const [search, setSearch] = useState("");
-  const [suppliers, setSuppliers] = useState([
-    { id: 1, name: "GreenFarm Supply Co.", contact: "09171234567", address: "Quezon City" },
-    { id: 2, name: "AgriHarvest Traders", contact: "09981234567", address: "Pasig City" },
-  ]);
+  const { user } = useAuth(); // user contains { username, token }
 
+  const [search, setSearch] = useState("");
+  const [suppliers, setSuppliers] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState(null);
+
+  // Fetch suppliers from backend
+  useEffect(() => {
+    async function fetchSuppliers() {
+      if (!user?.token) return;
+
+      try {
+        const res = await fetch("http://localhost:8080/api/suppliers", {
+          headers: {
+            "Authorization": `Bearer ${user.token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch suppliers");
+
+        const data = await res.json();
+        setSuppliers(data);
+      } catch (err) {
+        console.error("Failed to fetch suppliers:", err);
+      }
+    }
+
+    fetchSuppliers();
+  }, [user]);
 
   const filteredSuppliers = suppliers.filter((s) =>
     s.name.toLowerCase().includes(search.toLowerCase())
   );
-
-  function handleSave(e) {
-    e.preventDefault();
-
-    if (editingSupplier.id) {
-      // update
-      setSuppliers((prev) =>
-        prev.map((s) => (s.id === editingSupplier.id ? editingSupplier : s))
-      );
-    } else {
-      // add new
-      setSuppliers((prev) => [
-        ...prev,
-        { ...editingSupplier, id: Date.now() },
-      ]);
-    }
-
-    setModalOpen(false);
-    setEditingSupplier(null);
-  }
-
-  function handleDelete(id) {
-    setSuppliers((prev) => prev.filter((s) => s.id !== id));
-  }
 
   function openAddModal() {
     setEditingSupplier({ name: "", contact: "", address: "" });
@@ -46,6 +45,63 @@ export default function Suppliers() {
   function openEditModal(supplier) {
     setEditingSupplier({ ...supplier });
     setModalOpen(true);
+  }
+
+  async function handleSave(e) {
+    e.preventDefault();
+    if (!user?.token) return;
+
+    const method = editingSupplier.id ? "PUT" : "POST";
+    const url = editingSupplier.id
+      ? `http://localhost:8080/api/suppliers/${editingSupplier.id}`
+      : "http://localhost:8080/api/suppliers";
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${user.token}`,
+        },
+        body: JSON.stringify(editingSupplier),
+      });
+
+      if (!res.ok) throw new Error("Failed to save supplier");
+
+      const savedSupplier = await res.json();
+
+      setSuppliers((prev) => {
+        if (editingSupplier.id) {
+          return prev.map((s) => (s.id === savedSupplier.id ? savedSupplier : s));
+        } else {
+          return [...prev, savedSupplier];
+        }
+      });
+
+      setModalOpen(false);
+      setEditingSupplier(null);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function handleDelete(id) {
+    if (!user?.token) return;
+
+    try {
+      const res = await fetch(`http://localhost:8080/api/suppliers/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${user.token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to delete supplier");
+
+      setSuppliers((prev) => prev.filter((s) => s.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   return (
