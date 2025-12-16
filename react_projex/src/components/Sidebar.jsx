@@ -5,12 +5,6 @@ function Sidebar({ isOpen }) {
 
   const sections = [
     {
-      title: "Home",
-      items: [
-        { icon: "home", text: "Home", link: "/" }
-      ]
-    },
-    {
       title: "Dashboard",
       items: [
         { icon: "dashboard", text: "Dashboard", link: "/dashboard" }
@@ -82,7 +76,7 @@ function Sidebar({ isOpen }) {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 text-center text-xs text-white/60">
+      <div className="p-4 text-center text-xs text-white/60 font-lexend">
         © 2025 ARK Agri Trading
       </div>
     </div>

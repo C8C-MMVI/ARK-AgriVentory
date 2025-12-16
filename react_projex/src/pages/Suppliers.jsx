@@ -1,44 +1,39 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 
-export default function Suppliers() {
-  const { user } = useAuth(); // user contains { username, token }
+const API_URL = "http://localhost:8080/api/suppliers";
 
-  const [search, setSearch] = useState("");
+export default function Suppliers() {
+  const { user } = useAuth();
+
   const [suppliers, setSuppliers] = useState([]);
+  const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState(null);
 
-  // Fetch suppliers from backend
+  /* =====================
+     Fetch suppliers
+     ===================== */
   useEffect(() => {
-    async function fetchSuppliers() {
-      if (!user?.token) return;
+    if (!user?.token) return;
 
-      try {
-        const res = await fetch("http://localhost:8080/api/suppliers", {
-          headers: {
-            "Authorization": `Bearer ${user.token}`,
-          },
-        });
-
+    fetch(API_URL, {
+      headers: { Authorization: `Bearer ${user.token}` },
+    })
+      .then(res => {
         if (!res.ok) throw new Error("Failed to fetch suppliers");
-
-        const data = await res.json();
-        setSuppliers(data);
-      } catch (err) {
-        console.error("Failed to fetch suppliers:", err);
-      }
-    }
-
-    fetchSuppliers();
+        return res.json();
+      })
+      .then(setSuppliers)
+      .catch(console.error);
   }, [user]);
 
-  const filteredSuppliers = suppliers.filter((s) =>
+  const filteredSuppliers = suppliers.filter(s =>
     s.name.toLowerCase().includes(search.toLowerCase())
   );
 
   function openAddModal() {
-    setEditingSupplier({ name: "", contact: "", address: "" });
+    setEditingSupplier({ name: "", contactInfo: "", address: "" });
     setModalOpen(true);
   }
 
@@ -47,76 +42,84 @@ export default function Suppliers() {
     setModalOpen(true);
   }
 
+  function closeModal() {
+    setModalOpen(false);
+    setEditingSupplier(null);
+  }
+
+  /* =====================
+     Create / Update
+     ===================== */
   async function handleSave(e) {
     e.preventDefault();
-    if (!user?.token) return;
+    if (!user?.token || !editingSupplier) return;
 
-    const method = editingSupplier.id ? "PUT" : "POST";
-    const url = editingSupplier.id
-      ? `http://localhost:8080/api/suppliers/${editingSupplier.id}`
-      : "http://localhost:8080/api/suppliers";
+    const isEdit = Boolean(editingSupplier.supplierId);
+    const url = isEdit
+      ? `${API_URL}/${editingSupplier.supplierId}`
+      : API_URL;
 
     try {
       const res = await fetch(url, {
-        method,
+        method: isEdit ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${user.token}`,
+          Authorization: `Bearer ${user.token}`,
         },
         body: JSON.stringify(editingSupplier),
       });
 
       if (!res.ok) throw new Error("Failed to save supplier");
 
-      const savedSupplier = await res.json();
+      const saved = await res.json();
 
-      setSuppliers((prev) => {
-        if (editingSupplier.id) {
-          return prev.map((s) => (s.id === savedSupplier.id ? savedSupplier : s));
-        } else {
-          return [...prev, savedSupplier];
-        }
-      });
+      setSuppliers(prev =>
+        isEdit
+          ? prev.map(s => (s.supplierId === saved.supplierId ? saved : s))
+          : [...prev, saved]
+      );
 
-      setModalOpen(false);
-      setEditingSupplier(null);
+      closeModal();
     } catch (err) {
       console.error(err);
     }
   }
 
-  async function handleDelete(id) {
+  /* =====================
+     Delete
+     ===================== */
+  async function handleDelete(supplierId) {
     if (!user?.token) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/api/suppliers/${id}`, {
+      const res = await fetch(`${API_URL}/${supplierId}`, {
         method: "DELETE",
-        headers: {
-          "Authorization": `Bearer ${user.token}`,
-        },
+        headers: { Authorization: `Bearer ${user.token}` },
       });
 
       if (!res.ok) throw new Error("Failed to delete supplier");
 
-      setSuppliers((prev) => prev.filter((s) => s.id !== id));
+      setSuppliers(prev => prev.filter(s => s.supplierId !== supplierId));
     } catch (err) {
       console.error(err);
     }
   }
 
+  /* =====================
+     Render
+     ===================== */
   return (
     <div className="p-6 font-lexend">
       <h1 className="text-[48px] font-extrabold mb-4 text-black font-nunito uppercase">
         Supplier List
       </h1>
 
-      {/* Search + Add */}
       <div className="flex justify-between mb-4">
         <input
           type="text"
           placeholder="Search suppliers..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={e => setSearch(e.target.value)}
           className="px-3 py-2 border rounded w-64"
         />
         <button
@@ -127,7 +130,6 @@ export default function Suppliers() {
         </button>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-xl shadow overflow-hidden">
         <table className="w-full border-collapse">
           <thead className="bg-[#4C763B] text-white">
@@ -146,10 +148,10 @@ export default function Suppliers() {
                 </td>
               </tr>
             ) : (
-              filteredSuppliers.map((supplier) => (
-                <tr key={supplier.id} className="border-t">
+              filteredSuppliers.map(supplier => (
+                <tr key={supplier.supplierId} className="border-t">
                   <td className="p-3">{supplier.name}</td>
-                  <td className="p-3">{supplier.contact}</td>
+                  <td className="p-3">{supplier.contactInfo}</td>
                   <td className="p-3">{supplier.address}</td>
                   <td className="p-3 flex justify-center space-x-2">
                     <button
@@ -159,7 +161,7 @@ export default function Suppliers() {
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(supplier.id)}
+                      onClick={() => handleDelete(supplier.supplierId)}
                       className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
                     >
                       Delete
@@ -172,12 +174,11 @@ export default function Suppliers() {
         </table>
       </div>
 
-      {/* Modal */}
-      {modalOpen && (
+      {modalOpen && editingSupplier && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-md rounded-xl shadow-lg p-6">
             <h2 className="text-xl font-bold mb-4 text-[#4C763B]">
-              {editingSupplier.id ? "Edit Supplier" : "Add Supplier"}
+              {editingSupplier.supplierId ? "Edit Supplier" : "Add Supplier"}
             </h2>
 
             <form className="space-y-4" onSubmit={handleSave}>
@@ -186,7 +187,7 @@ export default function Suppliers() {
                 <input
                   type="text"
                   value={editingSupplier.name}
-                  onChange={(e) =>
+                  onChange={e =>
                     setEditingSupplier({ ...editingSupplier, name: e.target.value })
                   }
                   required
@@ -198,9 +199,9 @@ export default function Suppliers() {
                 <label className="font-medium">Contact</label>
                 <input
                   type="text"
-                  value={editingSupplier.contact}
-                  onChange={(e) =>
-                    setEditingSupplier({ ...editingSupplier, contact: e.target.value })
+                  value={editingSupplier.contactInfo}
+                  onChange={e =>
+                    setEditingSupplier({ ...editingSupplier, contactInfo: e.target.value })
                   }
                   required
                   className="w-full border rounded px-3 py-2"
@@ -212,7 +213,7 @@ export default function Suppliers() {
                 <input
                   type="text"
                   value={editingSupplier.address}
-                  onChange={(e) =>
+                  onChange={e =>
                     setEditingSupplier({ ...editingSupplier, address: e.target.value })
                   }
                   required
@@ -223,7 +224,7 @@ export default function Suppliers() {
               <div className="flex justify-end space-x-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => setModalOpen(false)}
+                  onClick={closeModal}
                   className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
                 >
                   Cancel

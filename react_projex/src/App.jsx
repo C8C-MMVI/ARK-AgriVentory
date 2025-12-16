@@ -11,7 +11,7 @@ import { Routes, Route } from "react-router-dom";
 
 // Pages
 import Dashboard from "./pages/Dashboard";
-import Home from "./pages/HomePAge";
+import Home from "./pages/HomePage";
 import UserSettings from "./pages/UserSettings";
 import POS from "./pages/PointOfSales";
 import Transactions from "./pages/Transactions";
