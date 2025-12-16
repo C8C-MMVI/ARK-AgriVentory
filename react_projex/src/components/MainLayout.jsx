@@ -4,14 +4,13 @@ import Header from "./Header";
 import { Routes, Route } from "react-router-dom";
 
 // Pages
-import Home from "../pages/HomePAge";
 import Dashboard from "../pages/Dashboard";
 import Categories from "../pages/Categories";
 import Products from "../pages/Products";
 import StockRecords from "../pages/StockRecords";
 import UserSettings from "../pages/UserSettings";
-import POS from "../pages/PointOfSales";
-import Transactions from "../pages/Transactions";
+import POS from "./POS/POS";
+import Transactions from "./Transactions/Transactions";
 import Suppliers from "../pages/Suppliers";
 import UserProfile from "../pages/UserProfile";
 
@@ -22,7 +21,6 @@ const MainLayout = ({ sidebarToggle, toggleSidebar }) => (
       <Header onSidebarToggle={toggleSidebar} />
       <main className="flex-1">
         <Routes>
-          <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/products" element={<Products />} />

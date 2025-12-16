@@ -202,8 +202,7 @@ export default function Categories() {
 
               <div>
                 <label className="font-medium">Description</label>
-                <input
-                  type="text"
+                <textarea
                   value={editingCategory.description}
                   onChange={e =>
                     setEditingCategory({
@@ -211,8 +210,9 @@ export default function Categories() {
                       description: e.target.value,
                     })
                   }
+                  rows={4}
                   required
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border rounded px-3 py-2 resize-none"
                 />
               </div>
 

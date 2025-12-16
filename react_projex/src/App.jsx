@@ -11,10 +11,10 @@ import { Routes, Route } from "react-router-dom";
 
 // Pages
 import Dashboard from "./pages/Dashboard";
-import Home from "./pages/HomePage";
+import Home from "./pages/HomePAge";
 import UserSettings from "./pages/UserSettings";
-import POS from "./pages/PointOfSales";
-import Transactions from "./pages/Transactions";
+import POS from "./components/POS/POS";
+import Transactions from "./components/Transactions/Transactions";
 import UserProfile from "./pages/UserProfile";
 import Categories from "./pages/Categories";
 import Products from "./pages/Products";
@@ -31,39 +31,39 @@ const App = () => {
 
   return (
     <Routes>
-      {/* Public routes */}
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        }
-      />
+  {/* Public routes */}
+  <Route
+    path="/login"
+    element={
+      <PublicRoute>
+        <Login />
+      </PublicRoute>
+    }
+  />
 
-      {/* Protected routes */}
-      <Route
-        path="/*"
-        element={
-          <ProtectedRoute>
-            <MainLayout sidebarToggle={sidebarToggle} toggleSidebar={toggleSidebar}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/categories" element={<Categories />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/stock" element={<StockRecords />} />
-                <Route path="/usersettings" element={<UserSettings />} />
-                <Route path="/pos" element={<POS />} />
-                <Route path="/transactions" element={<Transactions />} />
-                <Route path="/suppliers" element={<Suppliers />} />
-                <Route path="/profile" element={<UserProfile />} />
-              </Routes>
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+  {/* Protected routes */}
+  <Route
+    path="/*"
+    element={
+      <ProtectedRoute>
+        <MainLayout sidebarToggle={sidebarToggle} toggleSidebar={toggleSidebar}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/stock" element={<StockRecords />} />
+            <Route path="/usersettings" element={<UserSettings />} />
+            <Route path="/pos" element={<POS />} /> {/* Real POS */}
+            <Route path="/transactions" element={<Transactions />} /> {/* Real Transactions */}
+            <Route path="/suppliers" element={<Suppliers />} />
+            <Route path="/profile" element={<UserProfile />} />
+          </Routes>
+        </MainLayout>
+      </ProtectedRoute>
+    }
+  />
+</Routes>
   );
 };
 

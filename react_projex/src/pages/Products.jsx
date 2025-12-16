@@ -217,15 +217,16 @@ export default function Products() {
 
               <div>
                 <label className="font-medium">Description</label>
-                <input
-                  type="text"
+                <textarea
                   value={editingProduct.description}
                   onChange={e =>
                     setEditingProduct({ ...editingProduct, description: e.target.value })
                   }
-                  className="w-full border rounded px-3 py-2"
+                  rows={4}
+                  className="w-full border rounded px-3 py-2 resize-none"
                 />
               </div>
+
 
               <div>
                 <label className="font-medium">Base Price</label>
