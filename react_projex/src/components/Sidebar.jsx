@@ -77,7 +77,9 @@ function Sidebar({ isOpen }) {
 
       {/* Footer */}
       <div className="p-4 text-center text-xs text-white/60 font-lexend">
-        © 2025 ARK Agri Trading
+        <p>© 2025 ARK Agri Trading</p>
+        <p>Program made by BSIT-II students of LORMA Colleges</p>
+         
       </div>
     </div>
   );
