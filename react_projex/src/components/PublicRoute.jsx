@@ -6,7 +6,7 @@ export default function PublicRoute({ children }) {
 
   // If already logged in, redirect to home/dashboard
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;

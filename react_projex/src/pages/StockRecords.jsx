@@ -15,9 +15,6 @@ export default function StockRecords() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingStock, setEditingStock] = useState(null);
 
-  /* =====================
-     Fetch stockRecords, products & suppliers
-  ===================== */
   useEffect(() => {
     if (!user?.token) return;
 
@@ -46,10 +43,11 @@ export default function StockRecords() {
   });
 
   function openAddModal() {
+    const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd
     setEditingStock({
       quantity: 0,
       unitPrice: 0,
-      lastUpdated: "",
+      lastUpdated: today, // automatic date
       productId: "",
       supplierId: "",
     });
@@ -57,14 +55,11 @@ export default function StockRecords() {
   }
 
   function openEditModal(stock) {
-    console.log("Opening edit modal with stock:", stock);
-    console.log("Available suppliers:", suppliers);
-    console.log("Available products:", products);
-    
     setEditingStock({
       ...stock,
       productId: String(stock.productId),
       supplierId: String(stock.supplierId),
+      // lastUpdated will be updated automatically on save
     });
     setModalOpen(true);
   }
@@ -74,9 +69,6 @@ export default function StockRecords() {
     setEditingStock(null);
   }
 
-  /* =====================
-     Create / Update
-  ===================== */
   async function handleSave(e) {
     e.preventDefault();
     if (!user?.token || !editingStock) return;
@@ -84,11 +76,11 @@ export default function StockRecords() {
     const isEdit = Boolean(editingStock.stockRecordId);
     const url = isEdit ? `${API_URL}/${editingStock.stockRecordId}` : API_URL;
 
-    // Ensure IDs are numbers
     const payload = {
       ...editingStock,
       productId: Number(editingStock.productId),
       supplierId: Number(editingStock.supplierId),
+      lastUpdated: new Date().toISOString().split("T")[0], // auto-set date
     };
 
     try {
@@ -118,9 +110,6 @@ export default function StockRecords() {
     }
   }
 
-  /* =====================
-     Delete
-  ===================== */
   async function handleDelete(stockId) {
     if (!user?.token) return;
 
@@ -139,9 +128,6 @@ export default function StockRecords() {
     }
   }
 
-  /* =====================
-     Render
-  ===================== */
   return (
     <div className="p-6 font-lexend">
       <h1 className="text-[48px] font-extrabold mb-4 text-black font-nunito uppercase">
@@ -192,7 +178,7 @@ export default function StockRecords() {
                     <td className="p-3">{productName}</td>
                     <td className="p-3">{name}</td>
                     <td className="p-3">{stock.quantity}</td>
-                    <td className="p-3">{stock.unitPrice}</td>
+                    <td className="p-3">₱{stock.unitPrice?.toFixed(2)}</td>
                     <td className="p-3">{stock.lastUpdated}</td>
                     <td className="p-3 flex justify-center space-x-2">
                       <button
@@ -223,27 +209,26 @@ export default function StockRecords() {
               {editingStock.stockRecordId ? "Edit Stock" : "Add Stock"}
             </h2>
 
-            {suppliers.length === 0 && (
-              <div className="mb-4 p-2 bg-yellow-100 text-yellow-800 rounded">
-                Warning: Suppliers not loaded yet
-              </div>
-            )}
-
             <div className="space-y-4">
               <div>
                 <label className="font-medium">Product</label>
                 <select
                   value={editingStock.productId}
-                  onChange={e =>
-                    setEditingStock({ ...editingStock, productId: e.target.value })
-                  }
+                  onChange={e => {
+                    const selectedProduct = products.find(p => p.productId === Number(e.target.value));
+                    setEditingStock({ 
+                      ...editingStock, 
+                      productId: e.target.value,
+                      unitPrice: selectedProduct?.basePrice || 0
+                    });
+                  }}
                   required
                   className="w-full border rounded px-3 py-2"
                 >
                   <option value="">Select Product</option>
                   {products.map(p => (
                     <option key={p.productId} value={String(p.productId)}>
-                      {p.productName}
+                      {p.productName} - ₱{p.basePrice?.toFixed(2)}
                     </option>
                   ))}
                 </select>
@@ -253,26 +238,17 @@ export default function StockRecords() {
                 <label className="font-medium">Supplier</label>
                 <select
                   value={editingStock.supplierId}
-                  onChange={e => {
-                    console.log("Selected supplier ID:", e.target.value);
-                    setEditingStock({ ...editingStock, supplierId: e.target.value });
-                  }}
+                  onChange={e => setEditingStock({ ...editingStock, supplierId: e.target.value })}
                   required
                   className="w-full border rounded px-3 py-2"
                 >
                   <option value="">Select Supplier</option>
-                  {suppliers.map(s => {
-                    console.log("Rendering supplier option:", s.supplierId, s.name);
-                    return (
-                      <option key={s.supplierId} value={String(s.supplierId)}>
-                        {s.name}
-                      </option>
-                    );
-                  })}
+                  {suppliers.map(s => (
+                    <option key={s.supplierId} value={String(s.supplierId)}>
+                      {s.name}
+                    </option>
+                  ))}
                 </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  Current value: {editingStock.supplierId} (type: {typeof editingStock.supplierId})
-                </p>
               </div>
 
               <div>
@@ -290,31 +266,17 @@ export default function StockRecords() {
               </div>
 
               <div>
-                <label className="font-medium">Unit Price</label>
+                <label className="font-medium">Unit Price (from Product)</label>
                 <input
                   type="number"
                   value={editingStock.unitPrice}
-                  onChange={e =>
-                    setEditingStock({ ...editingStock, unitPrice: parseFloat(e.target.value) })
-                  }
-                  required
-                  className="w-full border rounded px-3 py-2"
-                  min="0"
+                  readOnly
+                  className="w-full border rounded px-3 py-2 bg-gray-100 cursor-not-allowed"
                   step="0.01"
                 />
-              </div>
-
-              <div>
-                <label className="font-medium">Last Updated</label>
-                <input
-                  type="date"
-                  value={editingStock.lastUpdated}
-                  onChange={e =>
-                    setEditingStock({ ...editingStock, lastUpdated: e.target.value })
-                  }
-                  required
-                  className="w-full border rounded px-3 py-2"
-                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Unit price is automatically set from the product's base price
+                </p>
               </div>
 
               <div className="flex justify-end space-x-2 pt-2">

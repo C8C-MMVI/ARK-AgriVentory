@@ -22,17 +22,17 @@ function Sidebar({ isOpen }) {
     {
       title: "Sales",
       items: [
-        { icon: "point_of_sale", text: "Point of Sale", link: "/pos" },
+        { icon: "point_of_sale", text: "Point of Sales", link: "/pos" },
         { icon: "finance", text: "Transactions", link: "/transactions" }
       ]
     },
-    {
-      title: "Users",
-      items: [
-        { icon: "user_attributes", text: "User Accounts", link: "/usersettings" },
-        { icon: "account_box", text: "User Profile", link: "/profile" }
-      ]
-    },
+    // {
+    //   title: "Users",
+    //   items: [
+    //     { icon: "user_attributes", text: "User Accounts", link: "/usersettings" },
+    //     { icon: "account_box", text: "User Profile", link: "/profile" }
+    //   ]
+    // },
   ];
 
   return (

@@ -6,7 +6,7 @@ export default function POSItem({ product, addToCart }) {
   return (
     <div className="border p-4 rounded">
       <h3 className="font-bold">{product.productName}</h3>
-      <p>${product.listPrice.toFixed(2)}</p>
+      <p>₱{product.listPrice.toFixed(2)}</p>
       <input
         type="number"
         min="1"

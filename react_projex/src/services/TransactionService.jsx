@@ -9,9 +9,9 @@ export function TransactionService(token) {
   });
 
   return {
-    getAll: () => api.get("/").then(res => res.data),
+    getAll: () => api.get("").then(res => res.data),
     getById: (id) => api.get(`/${id}`).then(res => res.data),
-    create: (transactionRequest) => api.post("/", transactionRequest).then(res => res.data),
+    create: (transactionRequest) => api.post("", transactionRequest).then(res => res.data),
     update: (id, transactionRequest) => api.put(`/${id}`, transactionRequest).then(res => res.data),
     delete: (id) => api.delete(`/${id}`).then(res => res.data),
   };

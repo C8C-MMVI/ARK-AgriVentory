@@ -10,10 +10,11 @@ export function TransactionDetailsService(token) {
 
   return {
     getAll: () => api.get("/").then(res => res.data),
-    getByTransactionId: (transactionId) =>
-      api.get(`/transaction/${transactionId}`).then(res => res.data),
-    create: (detailsRequest) => api.post("/", detailsRequest).then(res => res.data),
-    update: (id, detailsRequest) => api.put(`/${id}`, detailsRequest).then(res => res.data),
+    getById: (id) => api.get(`/${id}`).then(res => res.data),
+    create: (detailsRequest) =>
+      api.post("/", detailsRequest).then(res => res.data),
+    update: (id, detailsRequest) =>
+      api.put(`/${id}`, detailsRequest).then(res => res.data),
     delete: (id) => api.delete(`/${id}`).then(res => res.data),
   };
 }

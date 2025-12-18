@@ -168,8 +168,8 @@ export default function Products() {
                 <tr key={product.productId} className="border-t">
                   <td className="p-3">{product.productName}</td>
                   <td className="p-3">{product.description}</td>
-                  <td className="p-3">{product.basePrice}</td>
-                  <td className="p-3">{product.listPrice}</td>
+                  <td className="p-3">₱{product.basePrice}</td>
+                  <td className="p-3">₱{product.listPrice}</td>
                   <td className="p-3">
                     {categories.find(c => c.categoryId === product.categoryId)?.categoryName || "-"}
                   </td>

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext();
 
@@ -19,15 +19,24 @@ export function AuthProvider({ children }) {
       if (!res.ok) throw new Error("Invalid username or password");
 
       const data = await res.json();
+      
+      console.log("🔍 Login response:", data);
 
-      // Save user info and token
-      const userData = { username: data.username, token: data.token };
+      const userData = {
+        id: data.userId,
+        username: data.username,
+        token: data.token,
+      };
+      
+      console.log("✅ User data to store:", userData);
+      console.log("✅ User ID:", userData.id);
+
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
 
       return true;
     } catch (err) {
-      console.error(err);
+      console.error("❌ Login error:", err);
       return false;
     }
   };
