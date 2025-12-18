@@ -11,11 +11,10 @@ export default function Products() {
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [deletingProduct, setDeletingProduct] = useState(null);
 
-  /* =====================
-     Fetch products & categories
-     ===================== */
   useEffect(() => {
     if (!user?.token) return;
 
@@ -58,9 +57,16 @@ export default function Products() {
     setEditingProduct(null);
   }
 
-  /* =====================
-     Create / Update
-     ===================== */
+  function openDeleteModal(product) {
+    setDeletingProduct(product);
+    setDeleteModalOpen(true);
+  }
+
+  function closeDeleteModal() {
+    setDeleteModalOpen(false);
+    setDeletingProduct(null);
+  }
+
   async function handleSave(e) {
     e.preventDefault();
     if (!user?.token || !editingProduct) return;
@@ -68,7 +74,6 @@ export default function Products() {
     const isEdit = Boolean(editingProduct.productId);
     const url = isEdit ? `${API_URL}/${editingProduct.productId}` : API_URL;
 
-    // Only send categoryId, backend handles association
     const payload = { ...editingProduct };
 
     try {
@@ -98,30 +103,25 @@ export default function Products() {
     }
   }
 
-  /* =====================
-     Delete
-     ===================== */
-  async function handleDelete(productId) {
-    if (!user?.token) return;
+  async function confirmDelete() {
+    if (!user?.token || !deletingProduct) return;
 
     try {
-      const res = await fetch(`${API_URL}/${productId}`, {
+      const res = await fetch(`${API_URL}/${deletingProduct.productId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
       if (!res.ok) throw new Error("Failed to delete product");
 
-      setProducts(prev => prev.filter(p => p.productId !== productId));
+      setProducts(prev => prev.filter(p => p.productId !== deletingProduct.productId));
+      closeDeleteModal();
     } catch (err) {
       console.error(err);
       alert("Error deleting product.");
     }
   }
 
-  /* =====================
-     Render
-     ===================== */
   return (
     <div className="p-6 font-lexend">
       <h1 className="text-[48px] font-extrabold mb-4 text-black font-nunito uppercase">
@@ -168,8 +168,8 @@ export default function Products() {
                 <tr key={product.productId} className="border-t">
                   <td className="p-3">{product.productName}</td>
                   <td className="p-3">{product.description}</td>
-                  <td className="p-3">₱{product.basePrice}</td>
-                  <td className="p-3">₱{product.listPrice}</td>
+                  <td className="p-3">₱{product.basePrice?.toFixed(2)}</td>
+                  <td className="p-3">₱{product.listPrice?.toFixed(2)}</td>
                   <td className="p-3">
                     {categories.find(c => c.categoryId === product.categoryId)?.categoryName || "-"}
                   </td>
@@ -181,7 +181,7 @@ export default function Products() {
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(product.productId)}
+                      onClick={() => openDeleteModal(product)}
                       className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
                     >
                       Delete
@@ -194,6 +194,7 @@ export default function Products() {
         </table>
       </div>
 
+      {/* Edit/Add Modal */}
       {modalOpen && editingProduct && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-md rounded-xl shadow-lg p-6">
@@ -201,7 +202,7 @@ export default function Products() {
               {editingProduct.productId ? "Edit Product" : "Add Product"}
             </h2>
 
-            <form className="space-y-4" onSubmit={handleSave}>
+            <div className="space-y-4">
               <div>
                 <label className="font-medium">Name</label>
                 <input
@@ -226,7 +227,6 @@ export default function Products() {
                   className="w-full border rounded px-3 py-2 resize-none"
                 />
               </div>
-
 
               <div>
                 <label className="font-medium">Base Price</label>
@@ -286,13 +286,39 @@ export default function Products() {
                   Cancel
                 </button>
                 <button
-                  type="submit"
+                  onClick={handleSave}
                   className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 >
                   Save
                 </button>
               </div>
-            </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && deletingProduct && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+          <div className="bg-white w-full max-w-sm rounded-xl shadow-lg p-6">
+            <h2 className="text-xl font-bold mb-4 text-red-600">Confirm Delete</h2>
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to delete <span className="font-bold">{deletingProduct.productName}</span>? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={closeDeleteModal}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-// Components
+// App.jsx
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import MainLayout from "./components/MainLayout";
@@ -9,6 +9,7 @@ import { Routes, Route } from "react-router-dom";
 
 // Pages
 import Login from "./pages/Login";
+// import NotFound from "./pages/NotFound";
 
 const App = () => {
   const [sidebarToggle, setSidebarToggle] = useState(true);
@@ -38,6 +39,9 @@ const App = () => {
           </ProtectedRoute>
         }
       />
+
+      {/* Catch-all 404 route outside MainLayout
+      <Route path="*" element={<NotFound />} /> */}
     </Routes>
   );
 };

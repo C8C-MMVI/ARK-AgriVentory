@@ -9,11 +9,10 @@ export default function Suppliers() {
   const [suppliers, setSuppliers] = useState([]);
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState(null);
+  const [deletingSupplier, setDeletingSupplier] = useState(null);
 
-  /* =====================
-     Fetch suppliers
-     ===================== */
   useEffect(() => {
     if (!user?.token) return;
 
@@ -47,9 +46,16 @@ export default function Suppliers() {
     setEditingSupplier(null);
   }
 
-  /* =====================
-     Create / Update
-     ===================== */
+  function openDeleteModal(supplier) {
+    setDeletingSupplier(supplier);
+    setDeleteModalOpen(true);
+  }
+
+  function closeDeleteModal() {
+    setDeleteModalOpen(false);
+    setDeletingSupplier(null);
+  }
+
   async function handleSave(e) {
     e.preventDefault();
     if (!user?.token || !editingSupplier) return;
@@ -85,29 +91,24 @@ export default function Suppliers() {
     }
   }
 
-  /* =====================
-     Delete
-     ===================== */
-  async function handleDelete(supplierId) {
-    if (!user?.token) return;
+  async function confirmDelete() {
+    if (!user?.token || !deletingSupplier) return;
 
     try {
-      const res = await fetch(`${API_URL}/${supplierId}`, {
+      const res = await fetch(`${API_URL}/${deletingSupplier.supplierId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
       if (!res.ok) throw new Error("Failed to delete supplier");
 
-      setSuppliers(prev => prev.filter(s => s.supplierId !== supplierId));
+      setSuppliers(prev => prev.filter(s => s.supplierId !== deletingSupplier.supplierId));
+      closeDeleteModal();
     } catch (err) {
       console.error(err);
     }
   }
 
-  /* =====================
-     Render
-     ===================== */
   return (
     <div className="p-6 font-lexend">
       <h1 className="text-[48px] font-extrabold mb-4 text-black font-nunito uppercase">
@@ -161,7 +162,7 @@ export default function Suppliers() {
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(supplier.supplierId)}
+                      onClick={() => openDeleteModal(supplier)}
                       className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
                     >
                       Delete
@@ -174,6 +175,7 @@ export default function Suppliers() {
         </table>
       </div>
 
+      {/* Edit/Add Modal */}
       {modalOpen && editingSupplier && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-md rounded-xl shadow-lg p-6">
@@ -181,7 +183,7 @@ export default function Suppliers() {
               {editingSupplier.supplierId ? "Edit Supplier" : "Add Supplier"}
             </h2>
 
-            <form className="space-y-4" onSubmit={handleSave}>
+            <div className="space-y-4">
               <div>
                 <label className="font-medium">Name</label>
                 <input
@@ -230,13 +232,40 @@ export default function Suppliers() {
                   Cancel
                 </button>
                 <button
-                  type="submit"
+                  onClick={handleSave}
                   className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 >
                   Save
                 </button>
               </div>
-            </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && deletingSupplier && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+          <div className="bg-white w-full max-w-sm rounded-xl shadow-lg p-6">
+            <h2 className="text-xl font-bold mb-4 text-red-600">Confirm Delete</h2>
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to delete supplier{" "}
+              <span className="font-bold">{deletingSupplier.name}</span>? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={closeDeleteModal}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

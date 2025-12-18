@@ -13,7 +13,9 @@ export default function StockRecords() {
   const [suppliers, setSuppliers] = useState([]);
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editingStock, setEditingStock] = useState(null);
+  const [deletingStock, setDeletingStock] = useState(null);
 
   useEffect(() => {
     if (!user?.token) return;
@@ -43,11 +45,11 @@ export default function StockRecords() {
   });
 
   function openAddModal() {
-    const today = new Date().toISOString().split("T")[0]; // yyyy-mm-dd
+    const today = new Date().toISOString().split("T")[0];
     setEditingStock({
       quantity: 0,
       unitPrice: 0,
-      lastUpdated: today, // automatic date
+      lastUpdated: today,
       productId: "",
       supplierId: "",
     });
@@ -59,7 +61,6 @@ export default function StockRecords() {
       ...stock,
       productId: String(stock.productId),
       supplierId: String(stock.supplierId),
-      // lastUpdated will be updated automatically on save
     });
     setModalOpen(true);
   }
@@ -67,6 +68,16 @@ export default function StockRecords() {
   function closeModal() {
     setModalOpen(false);
     setEditingStock(null);
+  }
+
+  function openDeleteModal(stock) {
+    setDeletingStock(stock);
+    setDeleteModalOpen(true);
+  }
+
+  function closeDeleteModal() {
+    setDeleteModalOpen(false);
+    setDeletingStock(null);
   }
 
   async function handleSave(e) {
@@ -80,7 +91,7 @@ export default function StockRecords() {
       ...editingStock,
       productId: Number(editingStock.productId),
       supplierId: Number(editingStock.supplierId),
-      lastUpdated: new Date().toISOString().split("T")[0], // auto-set date
+      lastUpdated: new Date().toISOString().split("T")[0],
     };
 
     try {
@@ -110,18 +121,19 @@ export default function StockRecords() {
     }
   }
 
-  async function handleDelete(stockId) {
-    if (!user?.token) return;
+  async function confirmDelete() {
+    if (!user?.token || !deletingStock) return;
 
     try {
-      const res = await fetch(`${API_URL}/${stockId}`, {
+      const res = await fetch(`${API_URL}/${deletingStock.stockRecordId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
       if (!res.ok) throw new Error("Failed to delete stock record");
 
-      setStockRecords(prev => prev.filter(sr => sr.stockRecordId !== stockId));
+      setStockRecords(prev => prev.filter(sr => sr.stockRecordId !== deletingStock.stockRecordId));
+      closeDeleteModal();
     } catch (err) {
       console.error(err);
       alert("Error deleting stock record.");
@@ -172,11 +184,11 @@ export default function StockRecords() {
             ) : (
               filteredStock.map(stock => {
                 const productName = products.find(p => Number(p.productId) === Number(stock.productId))?.productName || "-";
-                const name = suppliers.find(s => Number(s.supplierId) === Number(stock.supplierId))?.name || "-";
+                const supplierName = suppliers.find(s => Number(s.supplierId) === Number(stock.supplierId))?.name || "-";
                 return (
                   <tr key={stock.stockRecordId} className="border-t">
                     <td className="p-3">{productName}</td>
-                    <td className="p-3">{name}</td>
+                    <td className="p-3">{supplierName}</td>
                     <td className="p-3">{stock.quantity}</td>
                     <td className="p-3">₱{stock.unitPrice?.toFixed(2)}</td>
                     <td className="p-3">{stock.lastUpdated}</td>
@@ -188,7 +200,7 @@ export default function StockRecords() {
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(stock.stockRecordId)}
+                        onClick={() => openDeleteModal(stock)}
                         className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
                       >
                         Delete
@@ -202,6 +214,7 @@ export default function StockRecords() {
         </table>
       </div>
 
+      {/* Edit/Add Modal */}
       {modalOpen && editingStock && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-md rounded-xl shadow-lg p-6">
@@ -294,6 +307,36 @@ export default function StockRecords() {
                   Save
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && deletingStock && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+          <div className="bg-white w-full max-w-sm rounded-xl shadow-lg p-6">
+            <h2 className="text-xl font-bold mb-4 text-red-600">Confirm Delete</h2>
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to delete this stock record for{" "}
+              <span className="font-bold">
+                {products.find(p => Number(p.productId) === Number(deletingStock.productId))?.productName || "this product"}
+              </span>
+              ? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={closeDeleteModal}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>
